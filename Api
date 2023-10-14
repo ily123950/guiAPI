@@ -1,0 +1,62 @@
+-- Функция для создания уведомления
+function NotifyGUI(text, duration)
+    -- Создаем GUI
+    local gui = Instance.new("ScreenGui")
+    gui.ResetOnSpawn = false
+
+    -- Создаем фон
+    local background = Instance.new("Frame")
+    background.Size = UDim2.new(0, 200, 0, 50)
+    background.Position = UDim2.new(-1, 0, 0, 0)
+    background.BackgroundColor3 = Color3.new(0, 0, 0)
+    background.BorderSizePixel = 0
+    background.Parent = gui
+
+    -- Создаем UICorner для закругленных углов фона
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 10)
+    corner.Parent = background
+
+    -- Создаем текст
+    local textLabel = Instance.new("TextLabel")
+    textLabel.Size = UDim2.new(1, 0, 1, 0)
+    textLabel.Text = text
+    textLabel.Font = Enum.Font.Gotham
+    textLabel.TextColor3 = Color3.new(1, 1, 1)
+    textLabel.TextSize = 14 -- Меньший размер текста
+    textLabel.BackgroundTransparency = 1
+    textLabel.Parent = background
+
+    -- Родительский элемент для GUI
+    local playerGui = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+    gui.Parent = playerGui
+
+    -- Проверяем наличие гуи с именем "NotifyGui" и устанавливаем ZIndex
+    local notifyGui = playerGui:FindFirstChild("NotifyGui")
+    if notifyGui then
+        local zIndex = notifyGui.ZIndex
+        background.ZIndex = zIndex - 1
+    end
+
+    -- Функция для анимации
+    function animateGui()
+        local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+        local startPos = UDim2.new(-1, 0, 0, 0)
+        local endPos = UDim2.new(0, 0, 0, 0)
+
+        local tween = game:GetService("TweenService"):Create(background, tweenInfo, {Position = endPos})
+        tween:Play()
+
+        tween.Completed:Connect(function()
+            wait(duration or 10) -- Длительность по умолчанию 10 секунд
+            local reverseTween = game:GetService("TweenService"):Create(background, tweenInfo, {Position = startPos})
+            reverseTween:Play()
+            reverseTween.Completed:Connect(function()
+                gui:Destroy()
+            end)
+        end)
+    end
+
+    -- Запускаем анимацию
+    animateGui()
+end
