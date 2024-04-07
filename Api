@@ -79,5 +79,3 @@ function Notify(title, text, duration)
     animateGui()
 end
 
--- Вызов функции с примером
-Notify("NA", "TEST", 5)
