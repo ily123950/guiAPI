@@ -1,29 +1,49 @@
 -- Функция для создания уведомления
-function NotifyGUI(text, duration)
+function Notify(title, text, duration)
     -- Создаем GUI
     local gui = Instance.new("ScreenGui")
     gui.ResetOnSpawn = false
 
     -- Создаем фон
     local background = Instance.new("Frame")
-    background.Size = UDim2.new(0, 200, 0, 50)
-    background.Position = UDim2.new(-1, 0, 0, 0)
+    background.Size = UDim2.new(0, 200, 0, 70)  -- Увеличиваем высоту фона
+    background.Position = UDim2.new(0, 10, 1, 10) -- Позиция ниже
     background.BackgroundColor3 = Color3.new(0, 0, 0)
     background.BorderSizePixel = 0
     background.Parent = gui
+
+    -- Создаем полоску внизу
+    local progressBar = Instance.new("Frame")
+    progressBar.Size = UDim2.new(1, 0, 0, 3) -- Высота полоски
+    progressBar.Position = UDim2.new(0, 0, 1, 0) -- Расположение внизу
+    progressBar.BackgroundColor3 = Color3.fromRGB(255, 0, 0) -- Красный цвет
+    progressBar.BorderSizePixel = 0
+    progressBar.Parent = background
 
     -- Создаем UICorner для закругленных углов фона
     local corner = Instance.new("UICorner")
     corner.CornerRadius = UDim.new(0, 10)
     corner.Parent = background
 
-    -- Создаем текст
+    -- Создаем заголовок
+    local titleLabel = Instance.new("TextLabel")
+    titleLabel.Size = UDim2.new(1, 0, 0.2, 0) -- Высота заголовка
+    titleLabel.Position = UDim2.new(0, 0, 0, 0) -- Расположение вверху
+    titleLabel.Text = title
+    titleLabel.Font = Enum.Font.Gotham
+    titleLabel.TextColor3 = Color3.new(1, 1, 1)
+    titleLabel.TextSize = 12 -- Меньший размер текста
+    titleLabel.BackgroundTransparency = 1
+    titleLabel.Parent = background
+
+    -- Создаем текст сообщения
     local textLabel = Instance.new("TextLabel")
-    textLabel.Size = UDim2.new(1, 0, 1, 0)
+    textLabel.Size = UDim2.new(1, 0, 0.6, 0) -- Высота текста
+    textLabel.Position = UDim2.new(0, 0, 0.2, 0) -- Расположение текста чуть ниже заголовка
     textLabel.Text = text
     textLabel.Font = Enum.Font.Gotham
     textLabel.TextColor3 = Color3.new(1, 1, 1)
-    textLabel.TextSize = 14 -- Меньший размер текста
+    textLabel.TextSize = 14
     textLabel.BackgroundTransparency = 1
     textLabel.Parent = background
 
@@ -40,23 +60,24 @@ function NotifyGUI(text, duration)
 
     -- Функция для анимации
     function animateGui()
-        local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-        local startPos = UDim2.new(-1, 0, 0, 0)
-        local endPos = UDim2.new(0, 0, 0, 0)
+        local startPos = UDim2.new(0, 10, 1, 10)
+        local endPos = UDim2.new(0, 10, 0.80, 10) -- Уменьшаем высоту, на которую поднимается уведомление
 
-        local tween = game:GetService("TweenService"):Create(background, tweenInfo, {Position = endPos})
-        tween:Play()
+        background:TweenPosition(endPos, Enum.EasingDirection.Out, Enum.EasingStyle.Quart, 0.5, true)
 
-        tween.Completed:Connect(function()
-            wait(duration or 10) -- Длительность по умолчанию 10 секунд
-            local reverseTween = game:GetService("TweenService"):Create(background, tweenInfo, {Position = startPos})
-            reverseTween:Play()
-            reverseTween.Completed:Connect(function()
-                gui:Destroy()
-            end)
-        end)
+        wait(duration or 10) -- Длительность по умолчанию 10 секунд
+
+        background:TweenPosition(startPos, Enum.EasingDirection.In, Enum.EasingStyle.Quart, 0.5, true)
+
+        -- Подождать, пока анимация завершится полностью
+        wait(1) -- Увеличил время ожидания до 1 секунды для надежности
+
+        gui:Destroy()
     end
 
     -- Запускаем анимацию
     animateGui()
 end
+
+-- Вызов функции с примером
+Notify("NA", "TEST", 5)
